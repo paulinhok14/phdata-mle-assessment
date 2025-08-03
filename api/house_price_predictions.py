@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, create_model
 from typing import Optional, Dict, Any
 import os, time
 import joblib
@@ -15,7 +15,7 @@ data_path = os.path.join(repo_root, 'data')
 
 # Settings
 MODEL_NAME = 'model.pkl'
-MODEL_VERSION = ''
+MODEL_VERSION = '0.1.0'
 MODEL_FEATURES = json.load(open(os.path.join(models_path, 'model_features.json')))
 
 # Instancing API app
@@ -28,16 +28,13 @@ app = FastAPI(
 # Loading pre-trained model
 model = joblib.load(os.path.join(models_path, MODEL_NAME))
 
+# Dynamic Model creating in order to have scalability without liability
+def generate_dynamic_model(features: list) -> BaseModel:
+    fields = {feature: (Optional[float], ...) for feature in features}
+    return create_model("PropertyFeatures", **fields)
+
 # Input Features Model
-class PropertyFeatures(BaseModel):
-    bedrooms: int = Field(..., ge=0, description="Number of bedrooms")
-    bathrooms: float = Field(..., ge=0, description="Number of bathrooms")
-    sqft_living: int = Field(..., gt=0, description="Square footage of living space")
-    sqft_lot: int = Field(..., gt=0, description="Square footage of lot")
-    floors: float = Field(..., ge=0, description="Number of floors")
-    sqft_above: int = Field(..., ge=0, description="Square footage above ground")
-    sqft_basement: int = Field(..., ge=0, description="Square footage of basement")
-    zipcode: str = Field(..., description="ZIP code of the property")
+PropertyFeatures = generate_dynamic_model(MODEL_FEATURES)
 
 # Response Model
 class PredictionResponse(BaseModel):
@@ -62,7 +59,7 @@ def add_complementary_data(zipcode: str) -> pd.DataFrame:
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
-async def predict_house_price():
+async def predict_house_price(input_data: BaseModel):
     start_time = time.time()
 
     # Making prediction

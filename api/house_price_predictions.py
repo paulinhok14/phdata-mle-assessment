@@ -15,6 +15,7 @@ data_path = os.path.join(repo_root, 'data')
 
 # Settings
 MODEL_NAME = 'model.pkl'
+MODEL_VERSION = ''
 MODEL_FEATURES = json.load(open(os.path.join(models_path, 'model_features.json')))
 
 # Instancing API app
@@ -60,9 +61,26 @@ def add_complementary_data(zipcode: str) -> pd.DataFrame:
         raise HTTPException(status_code=500, detail=f"Error loading demographic data: {str(e)}")
 
 # Prediction endpoint
-@app.post('/predict')
+@app.post('/predict', response_model=PredictionResponse)
 async def predict_house_price():
     start_time = time.time()
+
+    # Making prediction
+
+    # Building response
+    response = PredictionResponse(
+           # prediction=round(float(prediction), 2),
+            #confidence_score=None,  # Add if model provides it
+            timestamp=datetime.now(),
+            model_version=MODEL_VERSION,
+            features_used=MODEL_FEATURES,
+            metadata={
+                "prediction_time_ms": round((time.time() - start_time) * 1000, 2),
+                # "zipcode_input": property_data.zipcode
+            }
+        )
+    
+    return response
 
 
 # Health check endpoint

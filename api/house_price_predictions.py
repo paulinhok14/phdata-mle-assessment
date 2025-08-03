@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional, Dict, Any
-import os
+import os, time
 import joblib
 import pandas as pd
 import json
@@ -15,7 +15,7 @@ data_path = os.path.join(repo_root, 'data')
 
 # Settings
 MODEL_NAME = 'model.pkl'
-model_features = json.load(open(os.path.join(models_path, 'model_features.json')))
+MODEL_FEATURES = json.load(open(os.path.join(models_path, 'model_features.json')))
 
 # Instancing API app
 app = FastAPI(
@@ -62,7 +62,8 @@ def add_complementary_data(zipcode: str) -> pd.DataFrame:
 # Prediction endpoint
 @app.post('/predict')
 async def predict_house_price():
-    pass
+    start_time = time.time()
+
 
 # Health check endpoint
 @app.get('/health')

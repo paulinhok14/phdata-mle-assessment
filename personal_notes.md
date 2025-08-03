@@ -35,6 +35,3 @@ create_model.py and try to figure out how well the model will generalize
  ## ------ ##
 
  Questions:
-
- 1- What are the real expected features? It says in instructions that is the columns from data/future_unseen_examples.csv, and we have "model_features.json" file that has slightly different amount of columns.
- A: I'm assuming model.features.json as the ground truth.

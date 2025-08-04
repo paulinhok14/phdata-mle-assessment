@@ -122,7 +122,7 @@ async def health_check():
 # Creating full URL for Prediction request
 url_price_prediction = f"{API_BASE_URL}/predict"
 
-# Test endpoint
-test_json = {'bedrooms': 3.0, 'bathrooms': 2.5, 'sqft_living': 1560.0, 'sqft_lot': 4800.0, 'floors': 2.0, 'waterfront': 0.0, 'view': 0.0, 'condition': 4.0, 'grade': 7.0, 'sqft_above': 1560.0, 'sqft_basement': 0.0, 'yr_built': 1974.0, 'yr_renovated': 0.0, 'zipcode': 98001.0, 'lat': 47.2653, 'long': -122.285, 'sqft_living15': 1510.0, 
-'sqft_lot15': 12240.0}
-response = requests.post(url_price_prediction, json=test_json)
+# Test endpoint - Commented out to prevent connection errors during startup
+# test_json = {'bedrooms': 3.0, 'bathrooms': 2.5, 'sqft_living': 1560.0, 'sqft_lot': 4800.0, 'floors': 2.0, 'waterfront': 0.0, 'view': 0.0, 'condition': 4.0, 'grade': 7.0, 'sqft_above': 1560.0, 'sqft_basement': 0.0, 'yr_built': 1974.0, 'yr_renovated': 0.0, 'zipcode': 98001.0, 'lat': 47.2653, 'long': -122.285, 'sqft_living15': 1510.0, 
+# 'sqft_lot15': 12240.0}
+# response = requests.post(url_price_prediction, json=test_json)

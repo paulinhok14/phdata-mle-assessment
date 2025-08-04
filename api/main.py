@@ -1,24 +1,13 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, create_model
+from schemas import PropertyFeatures, PredictionResponse
 from typing import Optional, Dict, Any
 import os, time
 import joblib
 import pandas as pd
-import json, requests
 from datetime import datetime
+import config # Importing configuration settings
 
-# Path names
-file_path = os.path.abspath(__file__)
-repo_root = os.path.dirname(os.path.dirname(file_path))
-models_path = os.path.join(repo_root, 'model')
-data_path = os.path.join(repo_root, 'data')
-
-# Settings
-MODEL_NAME = 'model.pkl'
-MODEL_VERSION = '0.1.0'
-MODEL_FEATURES = json.load(open(os.path.join(models_path, 'model_features.json')))
-# Environment Variables if any. Second @param is the default value
-API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000')
+config.set_environment_variables()  # Ensure environment variables are set
 
 # Instancing API app
 app = FastAPI(
@@ -28,24 +17,8 @@ app = FastAPI(
 )
 
 # Loading pre-trained model
-model = joblib.load(os.path.join(models_path, MODEL_NAME))
+model = joblib.load(os.path.join(MODELS_PATH, MODEL_NAME))
 
-# Dynamic Model creating in order to have scalability without liability
-def generate_dynamic_model(features: list) -> BaseModel:
-    fields = {feature: (Optional[float], ...) for feature in features}
-    return create_model("PropertyFeatures", **fields)
-
-# Input Features Model
-PropertyFeatures = generate_dynamic_model(MODEL_FEATURES)
-
-# Response Model
-class PredictionResponse(BaseModel):
-    prediction: float = Field(..., description="Predicted house price in USD")
-    confidence_score: Optional[float] = Field(None, description="Model confidence score (if available)")
-    timestamp: datetime = Field(default_factory=datetime.now, description="Prediction timestamp")
-    model_version: str = Field(default="1.0.0", description="Model version used")
-    features_used: list = Field(default_factory=list, description="List of features used for prediction")
-    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
 # Preprocessing input data
 def process_input_data(input_data: dict) -> pd.DataFrame:

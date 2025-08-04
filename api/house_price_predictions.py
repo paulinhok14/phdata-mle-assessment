@@ -45,22 +45,34 @@ class PredictionResponse(BaseModel):
     features_used: list = Field(default_factory=list, description="List of features used for prediction")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
-# Adding complementary demographic data
-def add_complementary_data(zipcode: str) -> pd.DataFrame:
-    """Add demographic data for the given ZIP code"""
-    try:
-        demographic_data = pd.read_csv(os.path.join(data_path, 'zipcode_demographics.csv'))
-        zipcode_data = demographic_data[demographic_data['zipcode'] == zipcode]
-        if zipcode_data.empty:
-            raise ValueError(f"No demographic data found for ZIP code: {zipcode}")
-        return zipcode_data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error loading demographic data: {str(e)}")
+# Preprocessing input data
+def process_input_data(input_data):
+    ''' Process input data to match model requirements.'''
+
+    # Filtering initial input data (future_unseen_examples.csv) to match model features
+    future_unseen_examples_features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'sqft_above', 'sqft_basement', 'zipcode'] # Zipcode is needed only to match geocoords info, it will be dropped.
+    df_future_unseen_examples_features = pd.DataFrame(input_data, columns=future_unseen_examples_features)
+
+    # Adding geocoordinates based on zipcode
+
+    
+    print(df_future_unseen_examples_features)
+
+    # try:
+    #     demographic_data = pd.read_csv(os.path.join(data_path, 'zipcode_demographics.csv'))
+    #     zipcode_data = demographic_data[demographic_data['zipcode'] == zipcode]
+    #     if zipcode_data.empty:
+    #         raise ValueError(f"No demographic data found for ZIP code: {zipcode}")
+    #     return zipcode_data
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=f"Error loading demographic data: {str(e)}")
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
 async def predict_house_price(input_data: BaseModel):
     start_time = time.time()
+
+    # Processing input data
 
     # Making prediction
 
@@ -89,7 +101,3 @@ async def health_check():
         "timestamp": datetime.now(),
         "model_loaded": model is not None
     }
-
-# add_complementary_data()
-df_zipcode_demographics = pd.read_csv(os.path.join(data_path, 'zipcode_demographics.csv'))
-print(df_zipcode_demographics.columns.tolist())

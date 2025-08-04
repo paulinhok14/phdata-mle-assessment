@@ -22,15 +22,27 @@ def read_csv_random_input_samples(n_samples: int = 5) -> pd.DataFrame:
 
 # Requesting predictions from the API
 def predict_property_price(property_data: dict) -> dict:
-    pass
+    
+    # Creating full URL for Prediction request
+    url_price_prediction = f"{API_BASE_URL}/predict"
+
+    # Requesting Property Predicted Price
+    response = requests.post(url=url_price_prediction, json=property_data)
+    print(response)
 
 
 def main():
 
     # Reading random input samples
-    read_csv_random_input_samples(n_samples=10)
+    df_random_samples = read_csv_random_input_samples(n_samples=10)
 
-    # Requesting predictions from the API
+    # For each house data, requesting predictions from the API
+    for index, row in df_random_samples.iterrows():
+        json_data = row.to_dict()
+        print(f"Requesting prediction for sample {index + 1}...")
+        predict_property_price(json_data)
+        
+
 
 # Init main
 if __name__ == "__main__":

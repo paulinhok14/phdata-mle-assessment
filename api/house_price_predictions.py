@@ -90,4 +90,6 @@ async def health_check():
         "model_loaded": model is not None
     }
 
-add_complementary_data()
+# add_complementary_data()
+df_zipcode_demographics = pd.read_csv(os.path.join(data_path, 'zipcode_demographics.csv'))
+print(df_zipcode_demographics.columns.tolist())

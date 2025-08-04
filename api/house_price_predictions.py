@@ -46,7 +46,7 @@ class PredictionResponse(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
 # Preprocessing input data
-def process_input_data(input_data):
+def process_input_data(input_data: dict):
     ''' Process input data to match model requirements.'''
 
     # Filtering initial input data (future_unseen_examples.csv) to match model features
@@ -55,7 +55,7 @@ def process_input_data(input_data):
 
     # Adding geocoordinates based on zipcode
 
-    
+
     print(df_future_unseen_examples_features)
 
     # try:
@@ -69,10 +69,11 @@ def process_input_data(input_data):
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
-async def predict_house_price(input_data: BaseModel):
+async def predict_house_price(input_data: BaseModel) -> dict:
     start_time = time.time()
 
     # Processing input data
+    process_input_data(input_data)
 
     # Making prediction
 

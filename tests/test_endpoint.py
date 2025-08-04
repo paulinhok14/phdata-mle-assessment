@@ -34,7 +34,7 @@ def predict_property_price(property_data: dict) -> dict:
 def main():
 
     # Reading random input samples
-    df_random_samples = read_csv_random_input_samples(n_samples=10)
+    df_random_samples = read_csv_random_input_samples(n_samples=3)
 
     # For each house data, requesting predictions from the API
     for index, row in df_random_samples.iterrows():

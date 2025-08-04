@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any
 import os, time
 import joblib
 import pandas as pd
-import json
+import json, requests
 from datetime import datetime
 
 # Path names
@@ -17,6 +17,8 @@ data_path = os.path.join(repo_root, 'data')
 MODEL_NAME = 'model.pkl'
 MODEL_VERSION = '0.1.0'
 MODEL_FEATURES = json.load(open(os.path.join(models_path, 'model_features.json')))
+# Environment Variables if any. Second @param is the default value
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000')
 
 # Instancing API app
 app = FastAPI(
@@ -54,22 +56,18 @@ def process_input_data(input_data: dict):
     df_future_unseen_examples_features = pd.DataFrame(input_data, columns=future_unseen_examples_features)
 
     # Adding geocoordinates based on zipcode
-
-
-    print(df_future_unseen_examples_features)
-
-    # try:
-    #     demographic_data = pd.read_csv(os.path.join(data_path, 'zipcode_demographics.csv'))
-    #     zipcode_data = demographic_data[demographic_data['zipcode'] == zipcode]
-    #     if zipcode_data.empty:
-    #         raise ValueError(f"No demographic data found for ZIP code: {zipcode}")
-    #     return zipcode_data
-    # except Exception as e:
-    #     raise HTTPException(status_code=500, detail=f"Error loading demographic data: {str(e)}")
+    try:
+        demographic_data = pd.read_csv(os.path.join(data_path, 'zipcode_demographics.csv'))
+        zipcode_data = demographic_data[demographic_data['zipcode'] == zipcode]
+        if zipcode_data.empty:
+            raise ValueError(f"No demographic data found for ZIP code: {zipcode}")
+        return zipcode_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading demographic data: {str(e)}")
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
-async def predict_house_price(input_data: BaseModel) -> dict:
+async def predict_house_price(input_data: Dict[str, Any]) -> dict:
     start_time = time.time()
 
     # Processing input data
@@ -78,19 +76,19 @@ async def predict_house_price(input_data: BaseModel) -> dict:
     # Making prediction
 
     # Building response
-    response = PredictionResponse(
-           # prediction=round(float(prediction), 2),
-            #confidence_score=None,  # Add if model provides it
-            timestamp=datetime.now(),
-            model_version=MODEL_VERSION,
-            features_used=MODEL_FEATURES,
-            metadata={
-                "prediction_time_ms": round((time.time() - start_time) * 1000, 2),
-                # "zipcode_input": property_data.zipcode
-            }
-        )
+    # response = PredictionResponse(
+    #        prediction=round(float(prediction), 2),
+    #         confidence_score=None,  # Add if model provides it
+    #         timestamp=datetime.now(),
+    #         model_version=MODEL_VERSION,
+    #         features_used=MODEL_FEATURES,
+    #         metadata={
+    #             "prediction_time_ms": round((time.time() - start_time) * 1000, 2),
+    #             # "zipcode_input": property_data.zipcode
+    #         }
+    #     )
     
-    return response
+    # return response
 
 
 # Health check endpoint
@@ -102,3 +100,13 @@ async def health_check():
         "timestamp": datetime.now(),
         "model_loaded": model is not None
     }
+
+
+
+# Creating full URL for Prediction request
+url_price_prediction = f"{API_BASE_URL}/predict"
+
+# Test endpoint
+test_json = {'bedrooms': 3.0, 'bathrooms': 2.5, 'sqft_living': 1560.0, 'sqft_lot': 4800.0, 'floors': 2.0, 'waterfront': 0.0, 'view': 0.0, 'condition': 4.0, 'grade': 7.0, 'sqft_above': 1560.0, 'sqft_basement': 0.0, 'yr_built': 1974.0, 'yr_renovated': 0.0, 'zipcode': 98001.0, 'lat': 47.2653, 'long': -122.285, 'sqft_living15': 1510.0, 
+'sqft_lot15': 12240.0}
+response = requests.post(url_price_prediction, json=test_json)

@@ -38,8 +38,12 @@ def process_input_data(input_data: Union[BaseModel, dict] ) -> pd.DataFrame:
         right_on='zipcode',
         how='left'
     )   
-    # Debug saving
-    debug_path = os.path.join(DATA_PATH, 'debug_processed_input.xlsx')
-    df_full_merged_data.to_excel(debug_path, index=False)
+
+    # Dropping Zipcode column as it is not needed for prediction
+    df_full_merged_data.drop(columns=['zipcode'], inplace=True)
 
     return df_full_merged_data
+
+# TO DO: Batch Processing
+def process_batch_data(batch_size):
+    pass

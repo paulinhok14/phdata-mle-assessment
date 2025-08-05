@@ -1,14 +1,15 @@
 from fastapi import FastAPI, HTTPException
 from schemas import PropertyFeatures, PredictionResponse
-from typing import Optional, Dict, Any, Type
+from typing import Type
 from pydantic import BaseModel
 import os, time
 import joblib
 import pandas as pd
 from datetime import datetime
 # Settings
-from config import MODELS_PATH, MODEL_NAME, DATA_PATH, MODEL_FEATURES, API_BASE_URL
+from config import MODELS_PATH, MODEL_NAME, MODEL_FEATURES, API_BASE_URL
 from schemas import generate_dynamic_model
+from utils import process_input_data
 
 # Instancing API app
 app = FastAPI(
@@ -22,8 +23,6 @@ model = joblib.load(os.path.join(MODELS_PATH, MODEL_NAME))
 
 # Input Features Schema
 PropertyFeatures: Type[BaseModel] = generate_dynamic_model(MODEL_FEATURES)
-
-
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)

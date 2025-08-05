@@ -1,8 +1,6 @@
 from pydantic import BaseModel, Field, create_model
 from typing import Optional, Dict, Any
-import json, os
 from datetime import datetime
-from config import MODEL_FEATURES
 
 # Dynamic Model creating in order to have scalability without liability
 def generate_dynamic_model(features: list) -> BaseModel:

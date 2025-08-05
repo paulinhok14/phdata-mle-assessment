@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 from fastapi import HTTPException
+# Settings
+from config import DATA_PATH
 
 # Preprocessing input data
 def process_input_data(input_data: dict) -> pd.DataFrame:

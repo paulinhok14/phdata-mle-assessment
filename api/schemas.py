@@ -2,21 +2,12 @@ from pydantic import BaseModel, Field, create_model
 from typing import Optional, Dict, Any
 import json, os
 from datetime import datetime
-
-# Settings
-MODEL_NAME = 'model.pkl'
-MODEL_VERSION = '0.1.0'
-MODEL_FEATURES = json.load(open(os.path.join(models_path, 'model_features.json')))
-# Environment Variables if any. Second @param is the default value
-API_BASE_URL = os.getenv('API_BASE_URL', 'http://127.0.0.1:8000')
+from config import MODEL_FEATURES
 
 # Dynamic Model creating in order to have scalability without liability
 def generate_dynamic_model(features: list) -> BaseModel:
     fields = {feature: (Optional[float], ...) for feature in features}
     return create_model("PropertyFeatures", **fields)
-
-# Input Features Model
-PropertyFeatures = generate_dynamic_model(MODEL_FEATURES)
 
 # Response Model
 class PredictionResponse(BaseModel):

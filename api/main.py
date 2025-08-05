@@ -6,7 +6,7 @@ import joblib
 import pandas as pd
 from datetime import datetime
 # Settings
-from api.config import MODELS_PATH, MODEL_NAME, MODEL_VERSION, MODEL_FEATURES, ENDPOINT_INPUT_SCHEMA
+from api.config import MODELS_PATH, MODEL_NAME, MODEL_VERSION, MODEL_FEATURES, ENDPOINT_INPUT_SCHEMA, APP_VERSION
 from api.schemas import generate_dynamic_model, PredictionResponse
 from api.utils import process_input_data
 
@@ -14,7 +14,7 @@ from api.utils import process_input_data
 app = FastAPI(
     title="House Price Prediction API",
     description="API for predicting house prices in Seattle area. Powered by Sound Realty.",
-    version="1.0.0"
+    version=APP_VERSION
 )
 
 # Loading pre-trained model

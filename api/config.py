@@ -10,6 +10,7 @@ MODELS_PATH = os.path.join(REPO_ROOT, 'model')
 DATA_PATH = os.path.join(REPO_ROOT, 'data')
 
 # Settings
+APP_VERSION = '1.0.0'
 MODEL_NAME = 'model.pkl'
 MODEL_VERSION = '0.1.0'
 ENDPOINT_INPUT_SCHEMA = pd.read_csv(os.path.join(DATA_PATH, 'future_unseen_examples.csv')).columns.tolist()

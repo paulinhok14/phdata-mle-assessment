@@ -26,7 +26,10 @@ def predict_property_price(property_data: dict) -> dict:
     
     # Debug
     print("Status:", response.status_code)
-    print("Erros de validação:", response.json())
+    try:
+        print("JSON:", response.json())
+    except Exception:
+        print("Response text:", response.text)
 
 
 def main():

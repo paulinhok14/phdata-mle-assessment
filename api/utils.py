@@ -1,16 +1,22 @@
 import os
 import pandas as pd
+from typing import Union
+from pydantic import BaseModel
 from fastapi import HTTPException
 # Settings
 from api.config import DATA_PATH
 
 # Preprocessing input data
-def process_input_data(input_data: dict) -> pd.DataFrame:
+def process_input_data(input_data: Union[BaseModel, dict] ) -> pd.DataFrame:
     ''' Process input data to match model requirements.'''
+
+    # Parsing Pydantic BaseModel input data to dict if it is not already a dict
+    if isinstance(input_data, BaseModel):
+        input_data = input_data.model_dump()
 
     # Filtering initial input data (future_unseen_examples.csv) to match model features
     future_unseen_examples_features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'sqft_above', 'sqft_basement', 'zipcode'] # Zipcode is needed only to match geocoords info, it will be dropped.
-    df_future_unseen_examples_features = pd.DataFrame(input_data, columns=future_unseen_examples_features)
+    df_future_unseen_examples_features = pd.DataFrame([input_data], columns=future_unseen_examples_features)
 
     # Extracting zipcode from input data
     zipcode = input_data['zipcode']

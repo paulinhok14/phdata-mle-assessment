@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from typing import Type
 from pydantic import BaseModel
 import os, time
@@ -11,7 +11,7 @@ from api.utils import process_input_data
 
 # Instancing API app
 app = FastAPI(
-    title="House Price Prediction API",
+    title="Sound Realty's House Price Prediction Service",
     description="API for predicting house prices in Seattle area. Powered by Sound Realty.",
     version=APP_VERSION
 )
@@ -24,28 +24,33 @@ PropertyFeatures: Type[BaseModel] = generate_dynamic_model(ENDPOINT_INPUT_SCHEMA
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
-async def predict_house_price(input_data: PropertyFeatures) -> dict: # type: ignore
+async def predict_house_price(payload: PropertyFeatures) -> dict: # type: ignore
     start_time = time.time()
 
+    # Select model
+
     # Processing input data
-    processed_data = process_input_data(input_data)
+    processed_data = process_input_data(payload)
 
     # Making prediction
-    prediction_array = model.predict(processed_data)
-    predicted_price = float(prediction_array[0])    
+    try:
+        prediction_array = model.predict(processed_data)
+        predicted_price = float(prediction_array[0])    
 
-    # Building response
-    response = PredictionResponse(
-        prediction=round(float(predicted_price), 2),
-        timestamp=datetime.now(),
-        model_name=MODEL_NAME,
-        model_version=MODEL_VERSION,
-        metadata={
-            'prediction_time_ms': round((time.time() - start_time) * 1000, 2),
-            'features_used': MODEL_FEATURES
-        }
-    )
-    
+        # Building response
+        response = PredictionResponse(
+            prediction=round(float(predicted_price), 2),
+            timestamp=datetime.now(),
+            model_name=MODEL_NAME,
+            model_version=MODEL_VERSION,
+            metadata={
+                'prediction_time_ms': round((time.time() - start_time) * 1000, 2),
+                'features_used': MODEL_FEATURES
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
+
     return response
 
 

@@ -25,9 +25,7 @@ PropertyFeatures: Type[BaseModel] = generate_dynamic_model(ENDPOINT_INPUT_SCHEMA
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
-# async def predict_house_price(input_data: PropertyFeatures) -> dict: # type: ignore
-async def predict_house_price(input_data: PropertyFeatures): # type: ignore
-
+async def predict_house_price(input_data: PropertyFeatures) -> dict: # type: ignore
     start_time = time.time()
 
     # Processing input data
@@ -35,21 +33,17 @@ async def predict_house_price(input_data: PropertyFeatures): # type: ignore
 
     # Making prediction
     prediction_array = model.predict(processed_data)
-    predicted_price = float(prediction_array[0])  # scalar    
-    print(predicted_price)
-
-    end_time = time.time()
+    predicted_price = float(prediction_array[0])    
 
     # Building response
     response = PredictionResponse(
         prediction=round(float(predicted_price), 2),
-        confidence_score=None,  # Add if model provides it
         timestamp=datetime.now(),
+        model_name=MODEL_NAME,
         model_version=MODEL_VERSION,
-        features_used=MODEL_FEATURES,
         metadata={
-            "prediction_time_ms": round((time.time() - start_time) * 1000, 2),
-            # "zipcode_input": property_data.zipcode
+            'prediction_time_ms': round((time.time() - start_time) * 1000, 2),
+            'features_used': MODEL_FEATURES
         }
     )
     

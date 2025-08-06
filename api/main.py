@@ -3,7 +3,6 @@ from typing import Type
 from pydantic import BaseModel
 import os, time
 import joblib
-import pandas as pd
 from datetime import datetime
 # Settings
 from api.config import MODELS_PATH, MODEL_NAME, MODEL_VERSION, MODEL_FEATURES, ENDPOINT_INPUT_SCHEMA, APP_VERSION

@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, create_model
 from typing import Optional, Dict, Any
 from datetime import datetime
 # Settings
-from api.config import MODEL_NAME, MODEL_VERSION, MODEL_FEATURES
+from api.config import MODEL_NAME, MODEL_VERSION
 
 # Dynamic Model creating in order to have scalability without liability
 def generate_dynamic_model(features: list) -> BaseModel:

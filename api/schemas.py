@@ -4,7 +4,7 @@ from datetime import datetime
 # Settings
 from api.config import MODEL_NAME, MODEL_VERSION
 
-# Dynamic Model creating in order to have scalability without liability
+# Dynamic Model creating in order to have scalability without liability based on future_unseen_examples.csv
 def generate_dynamic_model(features: list) -> BaseModel:
     fields = {feature: (Optional[float], ...) for feature in features}
     return create_model("PropertyFeatures", **fields)
@@ -16,3 +16,8 @@ class PredictionResponse(BaseModel):
     model_name: str = Field(default=MODEL_NAME, description="Model name used to prediction")
     model_version: str = Field(default=MODEL_VERSION, description="Model version used")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
+
+
+# Input schema for Bonus endpoint (based on kc_house_data.csv subset)
+class SalesDataPredictionInput(BaseModel):
+    pass

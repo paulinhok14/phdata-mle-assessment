@@ -6,7 +6,7 @@ import joblib
 from datetime import datetime
 # Settings
 from api.config import MODELS_PATH, MODEL_NAME, MODEL_VERSION, MODEL_FEATURES, ENDPOINT_INPUT_SCHEMA, APP_VERSION
-from api.schemas import generate_dynamic_model, PredictionResponse
+from api.schemas import generate_dynamic_model, PredictionResponse, SalesDataPredictionInput
 from api.utils import process_input_data
 
 # Instancing API app
@@ -52,6 +52,15 @@ async def predict_house_price(payload: PropertyFeatures) -> dict: # type: ignore
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
     return response
+
+# Bonus endpoint to predict based on reduced subset of kc_house_data.csv sales data
+@app.post('/predict_bonus')
+async def predict_based_on_sales_data(payload: SalesDataPredictionInput) -> dict:
+    """
+    Bonus endpoint to predict house price based on a reduced subset of kc_house_data.csv sales data.
+    This endpoint is for demonstration purposes and uses a simplified input schema.
+    """
+    start_time = time.time()
 
 
 # Health check endpoint

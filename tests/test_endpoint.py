@@ -44,7 +44,6 @@ def main():
         predict_property_price(json_data)
         
 
-
 # Init main
 if __name__ == "__main__":
     print("Reading random input samples from 'future_unseen_examples.csv'...")

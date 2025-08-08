@@ -4,7 +4,7 @@ from typing import Union
 from pydantic import BaseModel
 from fastapi import HTTPException
 # Settings
-from api.config import DATA_PATH
+from api.config import DATA_PATH, MAIN_ENDPOINT_INPUT_SCHEMA, MODEL_REQUIRED_FEATURES
 
 # Preprocessing input data
 def process_input_data(input_data: Union[BaseModel, dict] ) -> pd.DataFrame:
@@ -15,8 +15,7 @@ def process_input_data(input_data: Union[BaseModel, dict] ) -> pd.DataFrame:
         input_data = input_data.model_dump()
 
     # Filtering initial input data (future_unseen_examples.csv) to match model features
-    future_unseen_examples_features = ['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'sqft_above', 'sqft_basement', 'zipcode'] # Zipcode is needed only to match geocoords info, it will be dropped.
-    df_future_unseen_examples_features = pd.DataFrame([input_data], columns=future_unseen_examples_features)
+    df_future_unseen_examples_features = pd.DataFrame([input_data], columns=MAIN_ENDPOINT_INPUT_SCHEMA)
 
     # Extracting zipcode from input data
     zipcode = input_data['zipcode']
@@ -32,17 +31,22 @@ def process_input_data(input_data: Union[BaseModel, dict] ) -> pd.DataFrame:
     
     # Merging Data
     df_full_merged_data = pd.merge(
-        left= df_future_unseen_examples_features,
+        left=df_future_unseen_examples_features,
         right=zipcode_data,
         left_on='zipcode',
         right_on='zipcode',
         how='left'
     )   
 
-    # Dropping Zipcode column as it is not needed for prediction
-    df_full_merged_data.drop(columns=['zipcode'], inplace=True)
+    # Getting only required columns for model predicting
+    df_full_merged_data = df_full_merged_data[MODEL_REQUIRED_FEATURES]
 
     return df_full_merged_data
+
+
+# Processing bonus endpoint data
+def process_sales_data(input_data: Union[BaseModel, dict] ) -> pd.DataFrame:
+    pass
 
 # TO DO: Batch Processing
 def process_batch_data(batch_size):

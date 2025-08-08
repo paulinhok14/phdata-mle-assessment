@@ -5,8 +5,8 @@ import os, time
 import joblib
 from datetime import datetime
 # Settings
-from api.config import MODELS_PATH, MODEL_NAME, MODEL_VERSION, MODEL_FEATURES, ENDPOINT_INPUT_SCHEMA, APP_VERSION
-from api.schemas import generate_dynamic_model, PredictionResponse, SalesDataInputSchema
+from api.config import MODELS_PATH, MODEL_NAME, MODEL_VERSION, MODEL_REQUIRED_FEATURES, MAIN_ENDPOINT_INPUT_SCHEMA, APP_VERSION, SALES_DATA_FEATURES
+from api.schemas import generate_dynamic_model, generate_sales_data_input_schema, PredictionResponse
 from api.utils import process_input_data
 
 # Instancing API app
@@ -19,8 +19,9 @@ app = FastAPI(
 # Loading pre-trained model
 model = joblib.load(os.path.join(MODELS_PATH, MODEL_NAME))
 
-# Input Features Schema
-PropertyFeatures: Type[BaseModel] = generate_dynamic_model(ENDPOINT_INPUT_SCHEMA)
+# Main Input Features Schema
+PropertyFeatures: Type[BaseModel] = generate_dynamic_model(MAIN_ENDPOINT_INPUT_SCHEMA)
+SalesDataInputSchema: Type[BaseModel] = generate_sales_data_input_schema(SALES_DATA_FEATURES)
 
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
@@ -45,7 +46,7 @@ async def predict_house_price(payload: PropertyFeatures) -> dict: # type: ignore
             model_version=MODEL_VERSION,
             metadata={
                 'prediction_time_ms': round((time.time() - start_time) * 1000, 2),
-                'features_used': MODEL_FEATURES
+                'features_used': MODEL_REQUIRED_FEATURES
             }
         )
     except Exception as e:
@@ -55,10 +56,10 @@ async def predict_house_price(payload: PropertyFeatures) -> dict: # type: ignore
 
 # Bonus endpoint to predict based on reduced subset of kc_house_data.csv sales data
 @app.post('/predict_bonus', response_model=PredictionResponse)
-async def predict_based_on_sales_data(payload: SalesDataInputSchema) -> dict:
+async def predict_based_on_sales_data(payload: SalesDataInputSchema) -> dict: # type: ignore
     """
     Bonus endpoint to predict house price based on a reduced subset of kc_house_data.csv sales data.
-    This endpoint is for demonstration purposes and uses a simplified input schema.
+    This endpoint uses a simplified input schema.
     """
     start_time = time.time()
 

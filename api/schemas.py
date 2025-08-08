@@ -19,5 +19,6 @@ class PredictionResponse(BaseModel):
 
 
 # Input schema for Bonus endpoint (based on kc_house_data.csv subset)
-class SalesDataPredictionInput(BaseModel):
-    pass
+def generate_sales_data_input_schema(features: list) -> BaseModel:
+    fields = {feature: (Optional[float], ...) for feature in features}
+    return create_model("SalesDataInputSchema", **fields)

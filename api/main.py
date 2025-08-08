@@ -109,7 +109,6 @@ def reload_model_endpoint(model_name: str = Query(default=MODEL_NAME)) -> dict:
     return {"status": "reloaded", "model_name": model_name}
 
         
-
 # Health check endpoint
 @app.get('/health')
 async def health_check() -> dict:

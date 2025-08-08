@@ -48,8 +48,8 @@ def main():
     # Reading random input samples
     df_random_samples = read_csv_random_input_samples(n_samples=3)
 
-    # Shifting to another model
-    reload_model_at_runtime(model_name='rf_regressor_sample-v2.pkl')
+    # Swapping to another model
+    # reload_model_at_runtime(model_name='rf_regressor_sample-v2.pkl')
 
     # For each house data, requesting predictions from the API
     for index, row in df_random_samples.iterrows():

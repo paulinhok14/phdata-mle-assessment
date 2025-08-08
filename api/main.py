@@ -94,7 +94,7 @@ async def predict_based_on_sales_data(payload: SalesDataInputSchema) -> dict: # 
 
 
 # Change model endpoint
-@app.post('/reload_model')
+@app.api_route('/reload_model', methods=['GET', 'POST'])
 def reload_model_endpoint(model_name: str = Query(default=MODEL_NAME)) -> dict:
     """
     Endpoint to reload the model from disk at runtime (zero-downtime)

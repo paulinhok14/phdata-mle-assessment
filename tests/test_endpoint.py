@@ -5,7 +5,7 @@ import requests
 # Adding the project root directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Settings
-from api.config import API_BASE_URL, DATA_PATH
+from api.config import API_BASE_URL, DATA_PATH, MODEL_NAME
 
 
 # Read and return random input samples
@@ -31,21 +31,36 @@ def predict_property_price(property_data: dict) -> dict:
     except Exception:
         print("Response text:", response.text)
 
+def reload_model_at_runtime(model_name: str = MODEL_NAME):
+    reload_model_url = f'{API_BASE_URL}/reload_model?model_name={model_name}'
+    # Send POST request
+    response = requests.post(reload_model_url)
+    # Showing response
+    if response.status_code == 200:
+        print(f"Model {model_name} reloaded successfully.")
+    else:
+        print(f"Failed to reload model {model_name}. Status code: {response.status_code}, Response: {response.text}")
 
 def main():
 
+    print("Reading random input samples from 'future_unseen_examples.csv'...")
+
     # Reading random input samples
     df_random_samples = read_csv_random_input_samples(n_samples=3)
+
+    # Shifting to another model
+    reload_model_at_runtime(model_name='rf_regressor_sample-v2.pkl')
 
     # For each house data, requesting predictions from the API
     for index, row in df_random_samples.iterrows():
         json_data = row.to_dict()
         print(f"Requesting prediction for sample {index + 1}...")
         predict_property_price(json_data)
+
+    print("Random input samples read successfully.")
         
 
 # Init main
 if __name__ == "__main__":
-    print("Reading random input samples from 'future_unseen_examples.csv'...")
     main()    
-    print("Random input samples read successfully.")
+    

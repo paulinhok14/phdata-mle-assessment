@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
+from contextlib import asynccontextmanager
 from typing import Type
 from pydantic import BaseModel
 import os, time
@@ -11,27 +12,40 @@ from api.schemas import generate_dynamic_model, generate_sales_data_input_schema
 from api.utils import process_input_data, process_sales_input_data
 
 model_lock = threading.Lock()
+model = None
+
+# Startup event
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    global model, MODEL_NAME
+    if os.path.exists(MODELS_PATH):
+        try:
+            model = joblib.load(os.path.join(MODELS_PATH, MODEL_NAME))
+            print(f"[lifespan] modelo carregado de {MODELS_PATH}")
+        except Exception as e:
+            print(f"[lifespan] erro ao carregar modelo: {e}")
+    else:
+        print(f"[lifespan] modelo nao encontrado em {MODELS_PATH}")
+    yield
+
 
 # Instancing API app
 app = FastAPI(
     title="Sound Realty's House Price Prediction Service",
     description="API for predicting house prices in Seattle area. Powered by Sound Realty.",
-    version=APP_VERSION
+    version=APP_VERSION,
+    lifespan=lifespan
 )
-
-# Loading pre-trained model
-model = joblib.load(os.path.join(MODELS_PATH, MODEL_NAME))
 
 # Main Input Features Schema
 PropertyFeatures: Type[BaseModel] = generate_dynamic_model(MAIN_ENDPOINT_INPUT_SCHEMA)
 SalesDataInputSchema: Type[BaseModel] = generate_sales_data_input_schema(SALES_DATA_FEATURES)
 
+
 # Prediction endpoint
 @app.post('/predict', response_model=PredictionResponse)
 async def predict_house_price(payload: PropertyFeatures) -> dict: # type: ignore
     start_time = time.time()
-
-    # Select model
 
     # Processing input data
     processed_data = process_input_data(payload)

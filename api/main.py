@@ -21,11 +21,11 @@ async def lifespan(app: FastAPI):
     if os.path.exists(MODELS_PATH):
         try:
             model = joblib.load(os.path.join(MODELS_PATH, MODEL_NAME))
-            print(f"[lifespan] modelo carregado de {MODELS_PATH}")
+            print(f"[lifespan] Model loaded from {MODELS_PATH}")
         except Exception as e:
-            print(f"[lifespan] erro ao carregar modelo: {e}")
+            print(f"[lifespan] Error loading Model: {e}")
     else:
-        print(f"[lifespan] modelo nao encontrado em {MODELS_PATH}")
+        print(f"[lifespan] Model not found in {MODELS_PATH}")
     yield
 
 

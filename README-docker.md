@@ -33,3 +33,28 @@ Once the container is running, access the API at:
 ## Notes
 - Make sure your model files and required data are available in the Docker build context if needed.
 - For development or troubleshooting, you can add `-it --rm` to the `docker run` command for interactive mode and automatic cleanup.
+
+## Running Locally Without Docker
+
+If you prefer to run the API locally, follow these steps in your terminal:
+
+1. Activate the virtual environment (adjust the path according to your OS):
+   - **Windows:**
+     ```bash
+     .venv\\Scripts\\activate
+     ```
+   - **Linux/Mac:**
+     ```bash
+     source venv/bin/activate
+     ```
+2. Install the dependencies (if you haven't already):
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Start the Uvicorn server:
+   ```bash
+   uvicorn api.main:app --reload
+   ```
+
+Access the API at [http://localhost:8000/docs](http://localhost:8000/docs)
+

@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from typing import Union
+from typing import Union, List, Dict
 from pydantic import BaseModel
 from fastapi import HTTPException
 # Settings
@@ -81,6 +81,6 @@ def process_sales_input_data(input_data: Union[BaseModel, dict] ) -> pd.DataFram
 
     return df_full_merged_data
 
-# TO DO: Batch Processing
-def process_batch_data(batch_size):
+# Future: Batch processing
+def process_batch_data(batch_data: List[Dict]) -> List[float]:
     pass
